@@ -7,6 +7,7 @@ daily job's lock and never drive the browsers at the same time."""
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -16,7 +17,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
-from scraper import analysis, db
+from scraper import analysis, db, emailer
 from scraper.fetch import ROOT
 from scraper.sites import adapter_for, check_supported
 
@@ -54,10 +55,26 @@ def name_from_url(url: str) -> str:
     return m.group(1).replace("-", " ").title() if m else urlparse(url).netloc
 
 
+EMAIL_RE = re.compile(r"^[^@\s,;<>]+@[^@\s,;<>]+\.[a-z]{2,}$", re.I)
+
+
 def state() -> dict:
     with db.connect() as con:
         return dict(shows=[s.to_dict() for s in analysis.all_summaries(con)],
-                    running=running(), catalog_updated=db.catalog_updated(con))
+                    ended=[dict(id=r["id"], name=r["name"], url=r["url"], ended_at=r["ended_at"]) for r in db.ended_shows(con)],
+                    running=running(), catalog_updated=db.catalog_updated(con),
+                    owner=os.environ.get("ALERT_TO"), public_url=os.environ.get("PUBLIC_URL"),
+                    signup_url=os.environ.get("SIGNUP_URL"),
+                    recipients=[dict(id=r["id"], email=r["email"], name=r["name"]) for r in db.recipients(con)])
+
+
+def add_recipient(body: dict) -> tuple[int, dict]:
+    email = (body.get("email") or "").strip()
+    if not EMAIL_RE.match(email):
+        return 400, {"error": "That doesn't look like an email address."}
+    with db.connect() as con:
+        db.add_recipient(con, email, body.get("name"))
+    return 200, {"ok": True}
 
 
 def show_detail(show_id: int) -> dict | None:
@@ -65,10 +82,7 @@ def show_detail(show_id: int) -> dict | None:
         sh = db.show(con, show_id)
         if not sh:
             return None
-        s = analysis.summarize(con, sh).to_dict()
-        upcoming = {p["performance"] for p in s["perfs"]}
-        s["history"] = {perf: days for perf, days in db.daily_prices(con, show_id).items() if perf in upcoming}
-        return s
+        return analysis.detail(con, sh)
 
 
 def track(body: dict) -> tuple[int, dict]:
@@ -134,6 +148,12 @@ class Handler(BaseHTTPRequestHandler):
             with db.connect() as con:
                 db.set_active(con, int(body["id"]), False)
             return self._send(200, {"ok": True})
+        if path == "/api/recipients/add":
+            return self._send(*add_recipient(body))
+        if path == "/api/recipients/remove":
+            with db.connect() as con:
+                db.remove_recipient(con, int(body["id"]))
+            return self._send(200, {"ok": True})
         if path == "/api/check":
             start_check(int(body["id"]) if body.get("id") else None)
             return self._send(200, {"ok": True, "running": running()})
@@ -141,6 +161,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    emailer.load_dotenv(ROOT / ".env")
     url = f"http://localhost:{PORT}"
     try:
         server = ThreadingHTTPServer((HOST, PORT), Handler)

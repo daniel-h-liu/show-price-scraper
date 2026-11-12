@@ -46,6 +46,7 @@ class ShowSummary:
     reason: str | None = None
     checked_at: str | None = None
     last_good_at: str | None = None    # when shown prices were fetched, if the latest check failed
+    fail_days: int = 0                 # days in a row the latest check of the day failed
     perfs: list[Perf] = field(default_factory=list)   # upcoming, sorted by date
     trend: list[tuple[str, int]] = field(default_factory=list)  # (day, cheapest upcoming)
 
@@ -61,7 +62,7 @@ class ShowSummary:
     def to_dict(self) -> dict:
         return dict(id=self.id, name=self.name, url=self.url, site=self.site, image_url=self.image_url,
                     status=self.status, reason=self.reason, checked_at=self.checked_at,
-                    last_good_at=self.last_good_at, perfs=[p.to_dict() for p in self.perfs],
+                    last_good_at=self.last_good_at, fail_days=self.fail_days, perfs=[p.to_dict() for p in self.perfs],
                     trend=self.trend, low_change_cents=self.low_change_cents,
                     cheapest=[p.to_dict() for p in self.cheapest[:5]])
 
@@ -72,6 +73,7 @@ def summarize(con, show) -> ShowSummary:
     if last is None:
         return s
     s.status, s.reason, s.checked_at = last["status"], last["reason"], last["checked_at"]
+    s.fail_days = db.fail_streak_days(con, show["id"])
     good = db.latest_good_check(con, show["id"])
     if good is None:
         return s
@@ -93,3 +95,11 @@ def summarize(con, show) -> ShowSummary:
 
 def all_summaries(con) -> list[ShowSummary]:
     return [summarize(con, sh) for sh in db.shows(con)]
+
+
+def detail(con, show) -> dict:
+    """Everything the page's per-show view needs: the summary plus each upcoming performance's history."""
+    d = summarize(con, show).to_dict()
+    upcoming = {p["performance"] for p in d["perfs"]}
+    d["history"] = {perf: days for perf, days in db.daily_prices(con, show["id"]).items() if perf in upcoming}
+    return d

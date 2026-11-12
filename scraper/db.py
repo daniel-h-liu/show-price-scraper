@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import sqlite3
 from contextlib import contextmanager
+from datetime import datetime
 from pathlib import Path
 
 from scraper.models import CheckResult, now_local
@@ -39,6 +40,12 @@ CREATE TABLE IF NOT EXISTS prices (
 );
 CREATE INDEX IF NOT EXISTS prices_perf ON prices(show_id, performance);
 CREATE INDEX IF NOT EXISTS prices_check ON prices(check_id);
+CREATE TABLE IF NOT EXISTS recipients (
+  id INTEGER PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  name TEXT,
+  added_at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS catalog (
   url TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -58,11 +65,18 @@ def connect(path: Path = DEFAULT_PATH):
     con.row_factory = sqlite3.Row
     con.execute("PRAGMA foreign_keys = ON")
     con.executescript(SCHEMA)
+    _migrate(con)
     try:
         yield con
         con.commit()
     finally:
         con.close()
+
+
+def _migrate(con) -> None:
+    cols = {r["name"] for r in con.execute("PRAGMA table_info(shows)")}
+    if "ended_at" not in cols:  # set when a show has no upcoming performances left; it stops being checked
+        con.execute("ALTER TABLE shows ADD COLUMN ended_at TEXT")
 
 
 # ---- shows ----
@@ -71,7 +85,8 @@ def add_show(con, name: str, url: str, site: str, image_url: str | None = None) 
     """Track a show (re-activating it if it was tracked before). Returns its id."""
     row = con.execute("SELECT id FROM shows WHERE url = ?", (url,)).fetchone()
     if row:
-        con.execute("UPDATE shows SET active = 1, name = ?, image_url = COALESCE(?, image_url) WHERE id = ?",
+        con.execute("UPDATE shows SET active = 1, ended_at = NULL, name = ?, image_url = COALESCE(?, image_url) "
+                    "WHERE id = ?",
                     (name, image_url, row["id"]))
         return row["id"]
     cur = con.execute("INSERT INTO shows (name, url, site, image_url, added_at) VALUES (?, ?, ?, ?, ?)",
@@ -84,8 +99,48 @@ def set_active(con, show_id: int, active: bool) -> None:
 
 
 def shows(con, active_only: bool = True) -> list[sqlite3.Row]:
-    q = "SELECT * FROM shows" + (" WHERE active = 1" if active_only else "") + " ORDER BY name COLLATE NOCASE"
+    """Tracked shows that are still running (active_only), or every show ever added."""
+    q = "SELECT * FROM shows" + (" WHERE active = 1 AND ended_at IS NULL" if active_only else "") + \
+        " ORDER BY name COLLATE NOCASE"
     return con.execute(q).fetchall()
+
+
+def ended_shows(con) -> list[sqlite3.Row]:
+    return con.execute("SELECT * FROM shows WHERE active = 1 AND ended_at IS NOT NULL "
+                       "ORDER BY ended_at DESC").fetchall()
+
+
+ENDED_GRACE_DAYS = 3  # if checks are failing, wait this long after the last known performance
+
+
+def end_if_finished(con, show_id: int, now: str | None = None) -> bool:
+    """Mark a show ended when every performance it ever listed is in the past and either the latest
+    check found nothing upcoming or the last performance was over ENDED_GRACE_DAYS ago. A show that
+    never listed a performance (e.g. not on sale yet) is never ended. Returns True if it was ended."""
+    now = now or now_local()
+    last_perf = con.execute("SELECT MAX(performance) AS m FROM prices WHERE show_id = ?", (show_id,)).fetchone()["m"]
+    if last_perf is None or last_perf > now:
+        return False
+    last = latest_check(con, show_id)
+    grace_over = (datetime.fromisoformat(now) - datetime.fromisoformat(last_perf)).days >= ENDED_GRACE_DAYS
+    if (last and last["status"] != "scrape_failed") or grace_over:
+        con.execute("UPDATE shows SET ended_at = ? WHERE id = ? AND ended_at IS NULL", (now, show_id))
+        return True
+    return False
+
+
+def fail_streak_days(con, show_id: int) -> int:
+    """How many most-recent days in a row this show's last check of the day failed."""
+    days: dict[str, str] = {}
+    for r in con.execute("SELECT substr(checked_at, 1, 10) AS day, status FROM checks WHERE show_id = ? "
+                         "ORDER BY checked_at, id", (show_id,)):
+        days[r["day"]] = r["status"]
+    n = 0
+    for day in sorted(days, reverse=True):
+        if days[day] != "scrape_failed":
+            break
+        n += 1
+    return n
 
 
 def show(con, show_id: int) -> sqlite3.Row | None:
@@ -143,6 +198,23 @@ def cheapest_over_time(con, show_id: int) -> list[tuple[str, int]]:
     for row in con.execute(q, (show_id,)):
         out[row["day"]] = row["low"]
     return sorted(out.items())
+
+
+# ---- digest recipients (besides ALERT_TO) ----
+
+def recipients(con) -> list[sqlite3.Row]:
+    return con.execute("SELECT * FROM recipients ORDER BY added_at").fetchall()
+
+
+def add_recipient(con, email: str, name: str | None = None) -> int:
+    con.execute("INSERT INTO recipients (email, name, added_at) VALUES (?, ?, ?) "
+                "ON CONFLICT(email) DO UPDATE SET name = COALESCE(excluded.name, name)",
+                (email.strip(), (name or "").strip() or None, now_local()))
+    return con.execute("SELECT id FROM recipients WHERE email = ?", (email.strip(),)).fetchone()["id"]
+
+
+def remove_recipient(con, recipient_id: int) -> None:
+    con.execute("DELETE FROM recipients WHERE id = ?", (recipient_id,))
 
 
 # ---- catalog ----

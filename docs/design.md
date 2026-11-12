@@ -66,3 +66,30 @@ today's price is ≤ 80% of usual and there are at least 2 earlier days.
 Checks started from the page run as `python -m scraper.run --show-id N` subprocesses. Every
 run takes `data/run.lock`, so the daily job and manual checks never drive the browsers (or
 the Chrome profile) at the same time.
+
+## Sharing
+
+- **Recipients** (`recipients` table, managed on the page): the friends' digest is the same content
+  without maintenance notes (failure reasons, Needs attention, ended shows), links to `PUBLIC_URL`
+  instead of localhost, and a "reply to stop" footer. Each recipient gets their own message (one SMTP
+  connection), so addresses are never shared.
+- **Public read-only page** (`scraper/publish.py`): the same `index.html` with `window.STATIC` injected,
+  reading `data/state.json` and `data/show-<id>.json`. No controls, no poster images (TodayTix's), no
+  recipients. Built into `.site/` and force-pushed as one fresh commit to `gh-pages` (as the GitHub
+  no-reply address) after each daily run when `PUBLIC_URL` is set. Push goes over HTTPS with
+  `gh auth git-credential`, so it works from launchd without an ssh-agent. A publish failure is
+  logged and doesn't affect the digest.
+- **Sign-ups**: GitHub Pages can't store anything, so "Sign up" opens a Google Form (`SIGNUP_URL`). The
+  owner adds the addresses they approve on the local page; nobody is added automatically, so no one
+  can sign up someone else.
+
+## Reliability
+
+- **Needs attention**: `fail_streak_days` = most recent consecutive days whose last check failed. At 2+,
+  the owner's digest opens with a warning; the page shows the streak on the card.
+- **Crash email**: if a full run raises, the owner gets "Show tracker FAILED this morning" with the
+  traceback instead of no email.
+- **Auto-stop**: after each check, a show is marked `ended_at` when every performance it ever listed is
+  in the past and either that check succeeded with nothing upcoming or the last performance was 3+
+  days ago. Never-listed shows (not on sale yet) are never ended. Ended shows aren't checked or
+  published; the owner's digest mentions it the day it happens, and tracking again revives it.

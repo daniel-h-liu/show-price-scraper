@@ -138,3 +138,93 @@ def test_name_from_url():
     assert name_from_url("https://www.todaytix.com/nyc/shows/46289-galileo-on-broadway") == "Galileo"
     assert name_from_url("https://www.metopera.org/smartseat?itemNumber=19152#/") == "Met Opera #19152"
     assert name_from_url("https://us.atgtickets.com/events/hadestown/walter-kerr-theatre/calendar/") == "Hadestown"
+
+
+# ---- failure streak, auto-stop, recipients, friends' digest ----
+
+def test_fail_streak_counts_recent_failed_days(con):
+    sid = db.add_show(con, "S", URL, "todaytix")
+    db.record_check(con, sid, check("2026-11-07T08:00", {"2026-12-01T20:00": 100}))
+    for day in ("08", "09"):
+        db.record_check(con, sid, CheckResult(Status.SCRAPE_FAILED, reason="blocked", checked_at=f"2026-11-{day}T08:00"))
+    assert db.fail_streak_days(con, sid) == 2
+    db.record_check(con, sid, check("2026-11-09T12:00", {"2026-12-01T20:00": 100}))  # later same day succeeded
+    assert db.fail_streak_days(con, sid) == 0
+
+
+def test_show_ends_when_every_performance_is_past(con):
+    sid = db.add_show(con, "Opera", URL, "metopera")
+    db.record_check(con, sid, check("2026-11-20T08:00", {"2026-11-27T19:30": 2500}))
+    assert not db.end_if_finished(con, sid, now="2026-11-26T08:00")          # still upcoming
+    db.record_check(con, sid, CheckResult(Status.SCRAPE_FAILED, reason="blocked", checked_at="2026-11-28T08:00"))
+    assert not db.end_if_finished(con, sid, now="2026-11-28T08:00")          # failing: wait out the grace period
+    assert db.end_if_finished(con, sid, now="2026-12-01T08:00")
+    assert db.shows(con) == [] and db.ended_shows(con)[0]["name"] == "Opera"
+    db.add_show(con, "Opera", URL, "metopera")                               # tracking again revives it
+    assert db.shows(con)[0]["ended_at"] is None
+
+
+def test_show_ends_right_away_when_check_finds_nothing_upcoming(con):
+    sid = db.add_show(con, "S", URL, "todaytix")
+    db.record_check(con, sid, check("2026-11-20T08:00", {"2026-11-27T19:30": 2500}))
+    db.record_check(con, sid, CheckResult(Status.NO_INVENTORY, checked_at="2026-11-28T08:00"))
+    assert db.end_if_finished(con, sid, now="2026-11-28T08:00")
+
+
+def test_show_never_listed_is_not_ended(con):
+    sid = db.add_show(con, "Coming soon", URL, "todaytix")
+    db.record_check(con, sid, CheckResult(Status.NO_INVENTORY, checked_at="2026-11-28T08:00"))
+    assert not db.end_if_finished(con, sid, now="2026-11-28T08:00")
+
+
+def test_recipients(con):
+    db.add_recipient(con, "Pal@Example.com", "Pal")
+    db.add_recipient(con, "pal@example.com")  # same address, any case: no duplicate, name kept
+    rows = db.recipients(con)
+    assert len(rows) == 1 and rows[0]["name"] == "Pal"
+    db.remove_recipient(con, rows[0]["id"])
+    assert db.recipients(con) == []
+
+
+def test_owner_vs_friend_digest(con):
+    sid = db.add_show(con, "Galileo", URL, "todaytix")
+    db.record_check(con, sid, check("2026-11-07T08:00", {"2026-12-01T20:00": 6200}))
+    for day in ("08", "09"):
+        db.record_check(con, sid, CheckResult(Status.SCRAPE_FAILED, reason="blocked: HTTP 403", checked_at=f"2026-11-{day}T08:00"))
+    sums = analysis.all_summaries(con)
+    ended = [{"name": "Samson et Dalila"}]
+    owner = digest.text(sums, ended=ended)
+    assert "NEEDS ATTENTION" in owner and "for 2 days" in owner and "Stopped checking Samson et Dalila" in owner
+    assert "localhost:8765" in owner
+    friend_a = digest.friend_audience("https://me.github.io/show-price-scraper/")
+    friend = digest.text(sums, friend_a, ended=ended)
+    assert "NEEDS ATTENTION" not in friend and "blocked" not in friend and "localhost" not in friend
+    assert "Couldn't check today." in friend and "Reply to this email to stop" in friend
+    html = digest.html(sums, friend_a)
+    assert f'href="https://me.github.io/show-price-scraper/#show-{sid}"' in html and "localhost" not in html
+    assert "localhost" not in digest.html(sums, digest.friend_audience(None))
+
+
+def test_send_all_addresses_each_recipient_separately():
+    FakeSMTP.sent.clear()
+    cfg = emailer.EmailConfig("me@x", "pw", "me@x")
+    errs = emailer.send_all(cfg, [("me@x", "s", "a", None), ("pal@y", "s", "b", "<i>b</i>")], smtp_factory=FakeSMTP)
+    assert errs == [None, None]
+    assert [m["To"] for m in FakeSMTP.sent] == ["me@x", "pal@y"]
+    assert all(m["Cc"] is None and m["Bcc"] is None for m in FakeSMTP.sent)
+
+
+def test_publish_builds_read_only_site(con, tmp_path):
+    from scraper import publish
+    sid = db.add_show(con, "Galileo", URL, "todaytix", "https://images.todaytix.com/poster.jpg")
+    db.record_check(con, sid, check("2026-11-09T08:00", {"2026-12-01T20:00": 6200}))
+    db.add_recipient(con, "secret-friend@example.com")
+    out = tmp_path / "site"
+    assert publish.build(con, out, signup_url="https://forms.gle/abc") == 1
+    page = (out / "index.html").read_text()
+    assert 'data-mode="static"' in page and '"signup_url": "https://forms.gle/abc"' in page
+    state = (out / "data" / "state.json").read_text()
+    detail = (out / "data" / f"show-{sid}.json").read_text()
+    assert "Galileo" in state and '"history"' in detail
+    everything = page + state + detail
+    assert "secret-friend" not in everything and "images.todaytix.com" not in everything

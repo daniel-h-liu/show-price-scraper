@@ -43,7 +43,9 @@ h2 { font-size: 17px; margin: 32px 0 12px; }
 .small { font-size: 13px; }
 button, .btn { font: inherit; font-size: 13px; border: 1px solid var(--hairline); background: var(--surface-1);
   color: var(--text-primary); border-radius: 8px; padding: 6px 12px; cursor: pointer; white-space: nowrap; }
-button:hover { border-color: var(--text-muted); }
+button:hover, a.btn:hover { border-color: var(--text-muted); }
+a.btn { display: inline-block; text-decoration: none; }
+a.btn.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
 button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
 button:disabled { opacity: .55; cursor: default; }
 input[type=text], input[type=url], input[type=search] { font: inherit; font-size: 14px; padding: 7px 10px; border-radius: 8px;
@@ -94,6 +96,19 @@ tbody tr { cursor: pointer; } tbody tr:hover, tbody tr.sel { background: var(--s
 .msg { font-size: 13px; margin: -4px 0 12px; }
 .msg.err { color: var(--critical-text); }
 .empty { padding: 24px; text-align: center; color: var(--text-secondary); }
+.thumb.mono { display: grid; place-items: center; font-weight: 600; font-size: 18px; color: var(--text-secondary); }
+.static-only { display: none; }
+html[data-mode="static"] .static-only { display: block; }
+html[data-mode="static"] .local-only { display: none !important; }
+.intro { max-width: 680px; margin: -8px 0 20px; }
+html[data-mode="static"] .signup { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.signup p { margin: 4px 0 0; max-width: 560px; }
+.people { list-style: none; padding: 0; margin: 0 0 12px; }
+.people li { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--hairline); font-size: 14px; }
+.ended { font-size: 13px; color: var(--text-secondary); }
+.ended li { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 6px 0; }
+footer { margin-top: 40px; font-size: 12px; color: var(--text-muted); }
+footer a, .intro a { color: var(--accent); }
 @media (max-width: 720px) {
   .charts { grid-template-columns: 1fr; }
   .show-head { grid-template-columns: 44px 1fr; }
@@ -109,13 +124,40 @@ tbody tr { cursor: pointer; } tbody tr:hover, tbody tr.sel { background: var(--s
       <h1>Show prices</h1>
       <div class="muted small" id="lastrun"></div>
     </div>
-    <div class="actions">
+    <div class="actions local-only">
       <span class="running" id="runall-status"></span>
       <button id="runall">Check all now</button>
     </div>
   </header>
+  <p class="intro muted static-only">A personal tracker for the NYC shows I'm watching. Every morning it checks the
+    cheapest ticket for every upcoming performance and flags a date as a <span class="tag-deal">Deal</span> when it's at
+    least 20% below that date's usual price. Prices are before fees.</p>
 
   <section id="tracked"></section>
+
+  <section class="card signup static-only" id="signup">
+    <div>
+      <div class="show-name">Get the daily digest</div>
+      <p class="muted small">One email each morning with the cheapest dates for the shows above. It only covers the
+        shows I've chosen to track, and you can't add your own. Reply to any digest to stop getting it.</p>
+    </div>
+    <a class="btn primary" id="signup-link" target="_blank" rel="noopener">Sign up</a>
+  </section>
+
+  <div class="local-only">
+  <section id="ended-section"></section>
+
+  <h2>Who gets the digest</h2>
+  <div class="card">
+    <ul class="people" id="people"></ul>
+    <div class="add-row" style="margin:0">
+      <input type="text" id="r-email" placeholder="friend@example.com" style="flex:1 1 220px">
+      <input type="text" id="r-name" placeholder="Name (optional)" style="flex:0 1 180px">
+      <button class="primary" id="r-go">Add</button>
+    </div>
+    <div class="msg" id="r-msg" style="margin:8px 0 0"></div>
+    <p class="muted small" id="people-note" style="margin:8px 0 0"></p>
+  </div>
 
   <h2>Add shows</h2>
   <div class="add-row">
@@ -130,6 +172,8 @@ tbody tr { cursor: pointer; } tbody tr:hover, tbody tr.sel { background: var(--s
   <div class="tabs" id="cat-tabs"></div>
   <div class="grid" id="catalog"></div>
   <p class="muted small" id="catalog-note"></p>
+  </div>
+  <footer class="static-only" id="footer"></footer>
 </main>
 
 <script>
@@ -140,12 +184,21 @@ const signed = c => (c > 0 ? "▲ +" : "▼ −") + money(Math.abs(c));
 const dt = s => new Date(s);  // naive local NYC strings; the viewer is in NYC
 const fmtWhen = s => dt(s).toLocaleString([], {weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit"}).replace(":00", "");
 const fmtDay = s => dt(s.length === 10 ? s + "T12:00" : s).toLocaleDateString([], {month: "short", day: "numeric"});
-const fmtAgo = s => { const m = (Date.now() - dt(s)) / 60000; return m < 2 ? "just now" : m < 60 ? `${Math.round(m)} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : fmtDay(s); };
+const fmtAbs = s => dt(s).toLocaleString([], {month: "short", day: "numeric", hour: "numeric", minute: "2-digit"}).replace(":00", "") + " ET";
+const fmtAgo = s => { if (STATIC) return fmtAbs(s); const m = (Date.now() - dt(s)) / 60000; return m < 2 ? "just now" : m < 60 ? `${Math.round(m)} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : fmtDay(s); };
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
+const STATIC = window.STATIC || null;  // set in the published read-only copy (scraper/publish.py)
+if (STATIC) document.documentElement.dataset.mode = "static";
 let STATE = {shows: [], running: []}, CATALOG = [], OPEN = new Set(), DETAIL = {}, CAT_FILTER = "All", SORT = {};
 
 async function api(path, body) {
+  if (STATIC) {  // read-only copy: pre-built JSON next to the page, no writes
+    if (body) throw new Error("This copy is read-only.");
+    const m = path.match(/^\/api\/show\/(\d+)$/);
+    path = path === "/api/state" ? "data/state.json" : m ? `data/show-${m[1]}.json` : null;
+    if (!path) return [];
+  }
   const r = await fetch(path, body ? {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)} : {});
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(j.error || r.statusText);
@@ -233,30 +286,34 @@ function headline(s) {
   return `<b>${money(b.price_cents)}</b> cheapest · ${fmtWhen(b.performance)}${ch ? ` · <span class="${ch < 0 ? "delta-down" : "delta-up"}">${signed(ch)}</span> vs previous day` : ""}`;
 }
 function problem(s) {
-  if (s.status === "scrape_failed") return `Last check failed: ${esc(s.reason)}${s.last_good_at ? `. Showing prices from ${fmtAgo(s.last_good_at)}.` : ""}`;
+  if (s.status === "scrape_failed") {
+    const days = s.fail_days >= 2 ? ` (failing for ${s.fail_days} days)` : "";
+    if (STATIC) return `Couldn't check this morning${s.last_good_at ? `. Showing prices from ${fmtAbs(s.last_good_at)}.` : "."}`;
+    return `Last check failed${days}: ${esc(s.reason)}${s.last_good_at ? `. Showing prices from ${fmtAgo(s.last_good_at)}.` : ""}`;
+  }
   if (s.status === "available" && s.reason) return esc(s.reason);
   return "";
 }
 function renderTracked() {
   const el = $("#tracked");
-  if (!STATE.shows.length) { el.innerHTML = `<div class="card empty">You're not tracking any shows yet. Pick some from the catalog below, or paste a URL.</div>`; return; }
+  if (!STATE.shows.length) { el.innerHTML = `<div class="card empty">${STATIC ? "Not tracking any shows right now." : "You're not tracking any shows yet. Pick some from the catalog below, or paste a URL."}</div>`; return; }
   el.innerHTML = STATE.shows.map(s => {
     const busy = STATE.running.includes(String(s.id)) || STATE.running.includes("all");
     const p = problem(s);
     return `<div class="card" id="show-${s.id}">
       <div class="show-head">
-        ${s.image_url ? `<img class="thumb" src="${esc(s.image_url)}" alt="">` : `<div class="thumb"></div>`}
+        ${s.image_url ? `<img class="thumb" src="${esc(s.image_url)}" alt="">` : `<div class="thumb mono" aria-hidden="true">${esc(s.name.replace(/^(the|a|an) /i, "")[0] || "")}</div>`}
         <div>
           <div class="show-name">${esc(s.name)} <span class="muted small">· ${esc(s.site)}</span></div>
           <div class="headline">${headline(s)}</div>
-          <div class="muted small">${s.checked_at ? "Checked " + fmtAgo(s.checked_at) : ""}${busy ? ` · <span class="running">checking…</span>` : ""}</div>
+          <div class="muted small">${s.checked_at ? "Checked " + fmtAgo(s.checked_at) : ""}${busy && !STATIC ? ` · <span class="running">checking…</span>` : ""}</div>
         </div>
         <div class="actions">
           ${sparkline(s.trend)}
           <button data-act="detail" data-id="${s.id}">${OPEN.has(s.id) ? "Hide" : "Calendar & history"}</button>
-          <button data-act="check" data-id="${s.id}" ${busy ? "disabled" : ""}>Check now</button>
+          ${STATIC ? "" : `<button data-act="check" data-id="${s.id}" ${busy ? "disabled" : ""}>Check now</button>`}
           <a class="btn" href="${esc(s.url)}" target="_blank" rel="noopener">Buy</a>
-          <button data-act="untrack" data-id="${s.id}" title="Stop tracking">✕</button>
+          ${STATIC ? "" : `<button data-act="untrack" data-id="${s.id}" title="Stop tracking">✕</button>`}
         </div>
       </div>
       ${p ? `<div class="warn">⚠ ${p}</div>` : ""}
@@ -330,15 +387,37 @@ function renderCatalog() {
 }
 
 // ---------- wiring ----------
+function renderStatic() {
+  const link = $("#signup-link");
+  if (STATIC.signup_url) link.href = STATIC.signup_url; else $("#signup").remove();
+  $("#footer").innerHTML = STATIC.repo_url ? `How it works: <a href="${esc(STATIC.repo_url)}">${esc(STATIC.repo_url.replace(/^https:\/\//, ""))}</a>` : "";
+}
+function renderPeople() {
+  const own = STATE.owner ? `<li><span>${esc(STATE.owner)} <span class="muted small">· you, with check warnings</span></span></li>` : "";
+  $("#people").innerHTML = own + (STATE.recipients || []).map(r => `<li><span>${esc(r.email)}${r.name ? ` <span class="muted small">· ${esc(r.name)}</span>` : ""}</span>
+    <button data-act="unrecipient" data-id="${r.id}" title="Remove">✕</button></li>`).join("");
+  const bits = ["Friends get the same digest without the maintenance warnings, each sent separately so nobody sees the other addresses."];
+  if (STATE.public_url) bits.push(`Their links go to the public page: <a href="${esc(STATE.public_url)}" target="_blank" rel="noopener">${esc(STATE.public_url)}</a>.`);
+  if (STATE.signup_url) bits.push(`People who sign up there land in your <a href="${esc(STATE.signup_url)}" target="_blank" rel="noopener">Google Form</a>'s responses; add the ones you want here.`);
+  $("#people-note").innerHTML = bits.join(" ");
+}
+function renderEnded() {
+  const e = STATE.ended || [];
+  $("#ended-section").innerHTML = e.length ? `<h2>Ended</h2><ul class="people ended">${e.map(x => `<li><span>${esc(x.name)} · no upcoming performances since ${fmtDay(x.ended_at)}</span>
+    <button data-act="retrack" data-url="${esc(x.url)}">Track again</button></li>`).join("")}</ul>` : "";
+}
 async function refresh() {
   STATE = await api("/api/state");
   const times = STATE.shows.map(s => s.checked_at).filter(Boolean).sort();
-  $("#lastrun").textContent = times.length ? `Last checked ${fmtAgo(times.at(-1))} · digest emails daily at 8 AM` : "Not checked yet";
+  $("#lastrun").textContent = STATIC ? (times.length ? `Prices as of ${fmtAbs(times.at(-1))} · updated every morning` : "")
+    : times.length ? `Last checked ${fmtAgo(times.at(-1))} · digest emails daily at 8 AM` : "Not checked yet";
+  if (STATIC) { renderTracked(); return; }
+  renderPeople(); renderEnded();
   $("#runall").disabled = STATE.running.includes("all");
   $("#runall-status").textContent = STATE.running.length ? "checking…" : "";
   renderTracked();
 }
-async function refreshCatalog() { CATALOG = await api("/api/catalog"); renderCatalog(); }
+async function refreshCatalog() { if (STATIC) return; CATALOG = await api("/api/catalog"); renderCatalog(); }
 let poll = null;
 function pollWhileRunning() {
   clearInterval(poll);
@@ -357,6 +436,8 @@ document.addEventListener("click", async ev => {
     else if (act === "check") { await api("/api/check", {id}); await refresh(); pollWhileRunning(); }
     else if (act === "untrack") { await api("/api/untrack", {id}); OPEN.delete(id); await refresh(); await refreshCatalog(); }
     else if (act === "trackcat") { t.disabled = true; await api("/api/track", {url: t.dataset.url}); await refresh(); await refreshCatalog(); pollWhileRunning(); }
+    else if (act === "retrack") { t.disabled = true; await api("/api/track", {url: t.dataset.url}); await refresh(); pollWhileRunning(); }
+    else if (act === "unrecipient") { await api("/api/recipients/remove", {id}); await refresh(); }
     else if (act === "cat") { CAT_FILTER = t.dataset.cat; renderCatalog(); }
     else if (act === "sort") { SORT[id] = t.dataset.sort; drawDetail(id); }
     else if (act === "pick") { DETAIL[id].selected = t.dataset.perf; drawDetail(id); }
@@ -374,12 +455,20 @@ $("#paste-go").addEventListener("click", async () => {
     await refresh(); await refreshCatalog(); pollWhileRunning();
   } catch (e) { alertMsg(e.message); }
 });
+$("#r-go").addEventListener("click", async () => {
+  const m = $("#r-msg");
+  try {
+    await api("/api/recipients/add", {email: $("#r-email").value.trim(), name: $("#r-name").value.trim()});
+    $("#r-email").value = ""; $("#r-name").value = ""; m.textContent = ""; await refresh();
+  } catch (e) { m.textContent = e.message; m.className = "msg err"; }
+});
 $("#runall").addEventListener("click", async () => { await api("/api/check", {}); await refresh(); pollWhileRunning(); });
 $("#search").addEventListener("input", renderCatalog);
 let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => OPEN.forEach(drawDetail), 150); });
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => OPEN.forEach(drawDetail));
 
 (async () => {
+  if (STATIC) renderStatic();
   await refresh(); await refreshCatalog();
   const m = location.hash.match(/^#show-(\d+)$/);
   if (m) { OPEN.add(Number(m[1])); renderTracked(); setTimeout(() => $(location.hash)?.scrollIntoView(), 300); }

@@ -7,6 +7,16 @@ its own usual price. Only the daily job is scheduled. When you want to pick show
 each one's full calendar and price history, run `scripts/page.sh`. It opens
 **http://localhost:8765**; Ctrl-C stops it.
 
+Friends can get the digest too: add them on the page. They get the same email without the
+maintenance warnings, each sent separately, with links to a **public read-only copy** of the page
+on GitHub Pages. That copy is rebuilt after each daily run, has no controls, and only serves static
+files, so visitor traffic never reaches the ticket sites. Visitors can ask to join through a Google
+Form; you approve them by adding them on the page.
+
+If a show's checks keep failing, the digest opens with a **Needs attention** warning, and if the
+whole run crashes you get a failure email instead of silence. Shows whose performances have all
+passed **stop being checked** automatically ("Ended" on the page, with a Track again button).
+
 Free to run: no LLM and no paid APIs. Each supported site has its own hand-written
 adapter (see `docs/design.md`).
 
@@ -35,7 +45,8 @@ scripts/install_launchd.sh                      # 8 AM daily check + digest (--u
 scripts/page.sh                                 # open the tracker page; Ctrl-C to stop
 .venv/bin/python -m scraper.run                 # check everything now and email the digest
 .venv/bin/python -m scraper.run --no-email      # check everything, no email
-.venv/bin/python -m scraper.run --digest-only   # email a digest from stored data
+.venv/bin/python -m scraper.run --digest-only   # email yourself a digest from stored data
+.venv/bin/python -m scraper.publish             # rebuild + push the public page now (--no-push: build .site/ only)
 .venv/bin/python -m scraper.run --test-email    # verify Gmail settings
 .venv/bin/python -m scraper.catalog             # refresh the TodayTix catalog
 .venv/bin/python -m pytest -q                   # tests
@@ -43,6 +54,7 @@ scripts/page.sh                                 # open the tracker page; Ctrl-C 
 
 Setup from scratch: `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt &&
 .venv/bin/playwright install chromium`, then copy `.env.example` to `.env` and fill in a
-Gmail app password. Google Chrome must be installed for the Met.
+Gmail app password. Set `PUBLIC_URL` (and optionally `SIGNUP_URL`) to publish the read-only page;
+publishing uses the `gh` CLI's login. Google Chrome must be installed for the Met.
 
 Data: `data/tracker.db` (SQLite). Logs: `logs/run.log`, `logs/web-jobs.log`.
