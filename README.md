@@ -18,7 +18,7 @@ whole run crashes you get a failure email instead of silence. Shows whose perfor
 passed **stop being checked** automatically ("Ended" on the page, with a Track again button).
 
 Free to run: no LLM and no paid APIs. Each supported site has its own hand-written
-adapter (see `docs/design.md`).
+adapter (see `docs/design.md`). Featuring it on another site: `docs/handoff-personal-site.md`.
 
 ## Supported sites
 
