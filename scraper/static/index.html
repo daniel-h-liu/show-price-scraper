@@ -230,7 +230,7 @@ function chart(el, pts, {line = true, tip, onPick, selected} = {}) {
     add("line", {x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: grid, "stroke-width": 1});
     add("text", {x: m.l - 6, y: Y(v) + 4, "text-anchor": "end", "font-size": 11, fill: ink}).textContent = money(Math.round(v));
   }
-  const nx = Math.max(2, Math.min(6, Math.floor((W - m.l) / 90)));
+  const nx = Math.max(2, Math.min(6, Math.floor((W - m.l) / 90), Math.round((x1 - x0) / 864e5) + 1));  // never repeat a day
   for (let i = 0; i < nx; i++) {
     const v = x0 + (x1 - x0) * i / (nx - 1);
     add("text", {x: X(v), y: H - 6, "text-anchor": i === 0 ? "start" : i === nx - 1 ? "end" : "middle", "font-size": 11, fill: ink})
