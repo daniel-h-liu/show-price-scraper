@@ -1,0 +1,137 @@
+{
+ "url": "https://api.todaytix.com/api/v3/events/46289/occurrences?limit=1000",
+ "body": {
+  "data": [
+   {
+    "admissionType": "TIMED",
+    "availabilityLevel": "LOW",
+    "endsAt": null,
+    "fromPrice": {
+     "amount": 30200,
+     "currency": "USD"
+    },
+    "id": "2473635",
+    "orderLimit": {
+     "max": 6,
+     "min": 1
+    },
+    "quantityAvailable": 1,
+    "startsAt": "2026-11-11T20:00:00-05:00",
+    "venueMap": {
+     "id": "740d859e-e831-434c-8caa-762f3c920bf5"
+    }
+   },
+   {
+    "admissionType": "TIMED",
+    "availabilityLevel": "LOW",
+    "endsAt": null,
+    "fromPrice": {
+     "amount": 7200,
+     "currency": "USD"
+    },
+    "id": "2473636",
+    "orderLimit": {
+     "max": 6,
+     "min": 1
+    },
+    "quantityAvailable": 31,
+    "startsAt": "2026-11-12T20:00:00-05:00",
+    "venueMap": {
+     "id": "740d859e-e831-434c-8caa-762f3c920bf5"
+    }
+   },
+   {
+    "admissionType": "TIMED",
+    "availabilityLevel": "LOW",
+    "endsAt": null,
+    "fromPrice": {
+     "amount": 7200,
+     "currency": "USD"
+    },
+    "id": "2473637",
+    "orderLimit": {
+     "max": 6,
+     "min": 1
+    },
+    "quantityAvailable": 49,
+    "startsAt": "2026-11-13T20:00:00-05:00",
+    "venueMap": {
+     "id": "740d859e-e831-434c-8caa-762f3c920bf5"
+    }
+   },
+   {
+    "admissionType": "TIMED",
+    "availabilityLevel": "LOW",
+    "endsAt": null,
+    "fromPrice": {
+     "amount": 7200,
+     "currency": "USD"
+    },
+    "id": "2473638",
+    "orderLimit": {
+     "max": 6,
+     "min": 1
+    },
+    "quantityAvailable": 46,
+    "startsAt": "2026-11-14T20:00:00-05:00",
+    "venueMap": {
+     "id": "740d859e-e831-434c-8caa-762f3c920bf5"
+    }
+   },
+   {
+    "admissionType": "TIMED",
+    "availabilityLevel": "LOW",
+    "endsAt": null,
+    "fromPrice": {
+     "amount": 6200,
+     "currency": "USD"
+    },
+    "id": "2473639",
+    "orderLimit": {
+     "max": 6,
+     "min": 1
+    },
+    "quantityAvailable": 55,
+    "startsAt": "2026-11-16T20:00:00-05:00",
+    "venueMap": {
+     "id": "740d859e-e831-434c-8caa-762f3c920bf5"
+    }
+   },
+   {
+    "admissionType": "TIMED",
+    "availabilityLevel": "LOW",
+    "endsAt": null,
+    "fromPrice": {
+     "amount": 6900,
+     "currency": "USD"
+    },
+    "id": "2473640",
+    "maxDiscountAmount": {
+     "amount": 1500,
+     "currency": "USD"
+    },
+    "orderLimit": {
+     "max": 6,
+     "min": 1
+    },
+    "promotions": [
+     {
+      "id": "813",
+      "name": "Special offer"
+     }
+    ],
+    "quantityAvailable": 137,
+    "startsAt": "2026-11-17T20:00:00-05:00",
+    "venueMap": {
+     "id": "740d859e-e831-434c-8caa-762f3c920bf5"
+    }
+   }
+  ],
+  "pagination": {
+   "limit": 1000,
+   "offset": 0,
+   "total": 219
+  },
+  "filters": []
+ }
+}

@@ -1,0 +1,314 @@
+{
+ "url": "https://calendar-service.core.platform.atgtickets.com/",
+ "body": {
+  "data": {
+   "getShow": {
+    "show": {
+     "images": {},
+     "isEmbargoed": false,
+     "status": "ONSALE",
+     "performanceMode": "BOLT",
+     "externalPurchaseLink": "",
+     "dates": {
+      "nextPerformanceDate": "2026-11-11T19:30:00.000Z",
+      "lastPerformanceDate": "2027-07-03T19:30:00.000Z",
+      "timeZone": "America/New_York"
+     },
+     "performances": [
+      {
+       "id": "06EF2FE6-20E2-4EA1-A256-9E0695397285",
+       "dates": {
+        "performanceDate": "2026-11-12T00:30:00.000Z",
+        "onSaleDate": null,
+        "memberOnSaleDate": null
+       },
+       "performanceTimeDescription": "Evening",
+       "availabilityStatus": "LOW",
+       "isAccessiblePerformance": false,
+       "accessibilityType": null,
+       "purchaseFlowType": "RESERVED",
+       "ruleKey": null,
+       "discountPercent": null,
+       "discountMinPrice": null,
+       "discountMinPriceFee": null,
+       "discountPromoCode": null,
+       "promoCode": {
+        "ids": null,
+        "promoType": null,
+        "promoLocked": false,
+        "accessCodes": null
+       },
+       "price": {
+        "minPrice": 139,
+        "minPriceFee": 15.9,
+        "maxPrice": 199,
+        "maxPriceFee": 22.77
+       },
+       "sectionAvailability": []
+      },
+      {
+       "id": "17A2A407-37F6-4F4E-AEDE-5D8F40D37842",
+       "dates": {
+        "performanceDate": "2026-11-13T00:00:00.000Z",
+        "onSaleDate": null,
+        "memberOnSaleDate": null
+       },
+       "performanceTimeDescription": "Evening",
+       "availabilityStatus": "LOW",
+       "isAccessiblePerformance": false,
+       "accessibilityType": null,
+       "purchaseFlowType": "RESERVED",
+       "ruleKey": null,
+       "discountPercent": null,
+       "discountMinPrice": null,
+       "discountMinPriceFee": null,
+       "discountPromoCode": null,
+       "promoCode": {
+        "ids": null,
+        "promoType": null,
+        "promoLocked": false,
+        "accessCodes": null
+       },
+       "price": {
+        "minPrice": 99,
+        "minPriceFee": 11.33,
+        "maxPrice": 199,
+        "maxPriceFee": 22.77
+       },
+       "sectionAvailability": []
+      },
+      {
+       "id": "B6556D99-64CE-403A-B399-F8C8A1A5F547",
+       "dates": {
+        "performanceDate": "2026-11-15T00:30:00.000Z",
+        "onSaleDate": null,
+        "memberOnSaleDate": null
+       },
+       "performanceTimeDescription": "Evening",
+       "availabilityStatus": "LOW",
+       "isAccessiblePerformance": false,
+       "accessibilityType": null,
+       "purchaseFlowType": "RESERVED",
+       "ruleKey": null,
+       "discountPercent": null,
+       "discountMinPrice": null,
+       "discountMinPriceFee": null,
+       "discountPromoCode": null,
+       "promoCode": {
+        "ids": null,
+        "promoType": null,
+        "promoLocked": false,
+        "accessCodes": null
+       },
+       "price": {
+        "minPrice": 119,
+        "minPriceFee": 13.61,
+        "maxPrice": 299,
+        "maxPriceFee": 34.21
+       },
+       "sectionAvailability": []
+      },
+      {
+       "id": "DCBFFFDE-F117-4733-A148-2A6649AD66BC",
+       "dates": {
+        "performanceDate": "2026-11-14T00:00:00.000Z",
+        "onSaleDate": null,
+        "memberOnSaleDate": null
+       },
+       "performanceTimeDescription": "Evening",
+       "availabilityStatus": "MEDIUM",
+       "isAccessiblePerformance": false,
+       "accessibilityType": null,
+       "purchaseFlowType": "RESERVED",
+       "ruleKey": null,
+       "discountPercent": null,
+       "discountMinPrice": null,
+       "discountMinPriceFee": null,
+       "discountPromoCode": null,
+       "promoCode": {
+        "ids": null,
+        "promoType": null,
+        "promoLocked": false,
+        "accessCodes": null
+       },
+       "price": {
+        "minPrice": 119,
+        "minPriceFee": 13.61,
+        "maxPrice": 225,
+        "maxPriceFee": 25.74
+       },
+       "sectionAvailability": []
+      },
+      {
+       "id": "E8428ED5-8FCC-412A-9336-92B1856710A5",
+       "dates": {
+        "performanceDate": "2026-11-14T19:00:00.000Z",
+        "onSaleDate": null,
+        "memberOnSaleDate": null
+       },
+       "performanceTimeDescription": "Matinee",
+       "availabilityStatus": "MEDIUM",
+       "isAccessiblePerformance": false,
+       "accessibilityType": null,
+       "purchaseFlowType": "RESERVED",
+       "ruleKey": null,
+       "discountPercent": null,
+       "discountMinPrice": null,
+       "discountMinPriceFee": null,
+       "discountPromoCode": null,
+       "promoCode": {
+        "ids": null,
+        "promoType": null,
+        "promoLocked": false,
+        "accessCodes": null
+       },
+       "price": {
+        "minPrice": 119,
+        "minPriceFee": 13.61,
+        "maxPrice": 249,
+        "maxPriceFee": 28.49
+       },
+       "sectionAvailability": []
+      },
+      {
+       "id": "4279E7B7-8270-4F34-8354-E8C8D5D8B92D",
+       "dates": {
+        "performanceDate": "2026-11-15T20:00:00.000Z",
+        "onSaleDate": null,
+        "memberOnSaleDate": null
+       },
+       "performanceTimeDescription": "Matinee",
+       "availabilityStatus": "MEDIUM",
+       "isAccessiblePerformance": false,
+       "accessibilityType": null,
+       "purchaseFlowType": "RESERVED",
+       "ruleKey": null,
+       "discountPercent": null,
+       "discountMinPrice": null,
+       "discountMinPriceFee": null,
+       "discountPromoCode": null,
+       "promoCode": {
+        "ids": null,
+        "promoType": null,
+        "promoLocked": false,
+        "accessCodes": null
+       },
+       "price": {
+        "minPrice": 119,
+        "minPriceFee": 13.61,
+        "maxPrice": 225,
+        "maxPriceFee": 25.74
+       },
+       "sectionAvailability": []
+      },
+      {
+       "id": "A8786E01-6156-467B-B74F-1122EEBAFDB9",
+       "dates": {
+        "performanceDate": "2026-11-20T00:00:00.000Z",
+        "onSaleDate": null,
+        "memberOnSaleDate": null
+       },
+       "performanceTimeDescription": "Evening",
+       "availabilityStatus": "GOOD",
+       "isAccessiblePerformance": false,
+       "accessibilityType": null,
+       "purchaseFlowType": "RESERVED",
+       "ruleKey": null,
+       "discountPercent": null,
+       "discountMinPrice": null,
+       "discountMinPriceFee": null,
+       "discountPromoCode": null,
+       "promoCode": {
+        "ids": null,
+        "promoType": null,
+        "promoLocked": false,
+        "accessCodes": null
+       },
+       "price": {
+        "minPrice": 59,
+        "minPriceFee": 6.75,
+        "maxPrice": 199,
+        "maxPriceFee": 22.77
+       },
+       "sectionAvailability": []
+      },
+      {
+       "id": "F8B402D4-3038-48DF-AA31-72C49A5441F4",
+       "dates": {
+        "performanceDate": "2026-12-03T00:00:00.000Z",
+        "onSaleDate": null,
+        "memberOnSaleDate": null
+       },
+       "performanceTimeDescription": "Evening",
+       "availabilityStatus": "GOOD",
+       "isAccessiblePerformance": false,
+       "accessibilityType": null,
+       "purchaseFlowType": "RESERVED",
+       "ruleKey": null,
+       "discountPercent": null,
+       "discountMinPrice": null,
+       "discountMinPriceFee": null,
+       "discountPromoCode": null,
+       "promoCode": {
+        "ids": null,
+        "promoType": null,
+        "promoLocked": false,
+        "accessCodes": null
+       },
+       "price": {
+        "minPrice": 79,
+        "minPriceFee": 9.04,
+        "maxPrice": 179,
+        "maxPriceFee": 20.48
+       },
+       "sectionAvailability": []
+      },
+      {
+       "id": "CA60B40A-C8E2-460E-9482-1181DFC752EA",
+       "dates": {
+        "performanceDate": "2026-12-07T00:30:00.000Z",
+        "onSaleDate": null,
+        "memberOnSaleDate": null
+       },
+       "performanceTimeDescription": "Evening",
+       "availabilityStatus": "GOOD",
+       "isAccessiblePerformance": false,
+       "accessibilityType": null,
+       "purchaseFlowType": "RESERVED",
+       "ruleKey": null,
+       "discountPercent": null,
+       "discountMinPrice": null,
+       "discountMinPriceFee": null,
+       "discountPromoCode": null,
+       "promoCode": {
+        "ids": null,
+        "promoType": null,
+        "promoLocked": false,
+        "accessCodes": null
+       },
+       "price": {
+        "minPrice": 69,
+        "minPriceFee": 7.89,
+        "maxPrice": 225,
+        "maxPriceFee": 25.74
+       },
+       "sectionAvailability": []
+      }
+     ]
+    },
+    "promoCode": {
+     "ids": null,
+     "promoType": null,
+     "accessCodes": null,
+     "singleUseCode": null
+    },
+    "status": {
+     "code": "200",
+     "message": "Success"
+    },
+    "singleUseError": null,
+    "isIsolatedCalendarRule": false
+   }
+  }
+ }
+}

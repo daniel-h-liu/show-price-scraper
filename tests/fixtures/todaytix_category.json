@@ -1,0 +1,195 @@
+{
+ "props": {
+  "pageProps": {
+   "productList": {
+    "results": {
+     "shows": [
+      {
+       "id": 46971,
+       "displayName": "Paranormal Activity ",
+       "slug": "paranormal-activity",
+       "images": {
+        "productMedia": {
+         "appHeroImage": {
+          "description": "",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/3E73q5Lt577FQGIk3fQbZw/478f0d108cfc1423c5c226d115979616/PNA0002-W-TodayTix-Hero-1440x580_v1__1_.jpg"
+          },
+          "title": "Paranormal Activity - Product Media - App Hero Image"
+         },
+         "appHeroImageTall": {
+          "description": "",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/UXwcH8I4yLMLylIV9TqnF/22318e0bd901c9ed1312043f1219a90a/Paranormal_Activity_1920x1080.jpg"
+          },
+          "title": "Paranormal Activity - Product Media - Hero 2"
+         },
+         "posterImage": {
+          "description": "",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/1qRm8PJBCyRZeAQiqCW6O4/3b3810ca6b7cc05dc30d5329bdaf03d3/PNA0002-W-TodayTix-Poster-480x720_v1.jpg"
+          },
+          "title": "Paranormal Activity - Product Media - Poster Image"
+         },
+         "posterImageLandscape": null,
+         "posterImageSquare": {
+          "description": "Poster of Paranormal Activity in New York.",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/6zhmrCE8WCEUdZou7jxRHD/5ab2260e09d086646e0e5fe22648fc73/PNA0002-W-TodayTix-ShowLeadSquare-1080x1080_v1__1_.jpg"
+          },
+          "title": "Paranormal Activity - Product Media - Square Image"
+         }
+        }
+       },
+       "venue": "August Wilson Theatre",
+       "lowPriceForRegularTickets": {
+        "display": "$59",
+        "currency": "USD",
+        "displayRounded": "$59",
+        "value": 59
+       },
+       "locationSeoName": "nyc"
+      },
+      {
+       "id": 43812,
+       "displayName": "The Lost Boys",
+       "slug": "the-lost-boys-on-broadway",
+       "images": {
+        "productMedia": {
+         "appHeroImage": {
+          "description": "",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/IQ6kCIlPgntvxkuLMO9AK/31d938a06fff349d12618a547723ac52/WFP-2715100-0926-03_TLB_062_PA_NEW_KEY_ART_TICKETING_ASSETS_091426_TodayTix_1440x580.png"
+          },
+          "title": "The Lost Boys on Broadway - Product Media - App Hero Image"
+         },
+         "appHeroImageTall": {
+          "description": "",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/3jHcAqlEFH2J0JGEHGP5FL/a435dba233ae2baede7a7a2c3b7c8412/WFP-2715100-0926-02_TLB_020_PA_LOGO_REQUESTS_2026_16x9.png"
+          },
+          "title": "The Lost Boys - Product Media - Hero Image 2"
+         },
+         "posterImage": {
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/5y6V3Nz4GFblLDae1wuiva/218ab380f027a1c0ee220945b6411377/WFP-2715100-0926-03_TLB_062_PA_NEW_KEY_ART_TICKETING_ASSETS_091426_TodayTix_480x720.png"
+          },
+          "title": "The Lost Boys on Broadway - Product Media - Poster Image"
+         },
+         "posterImageLandscape": null,
+         "posterImageSquare": {
+          "description": "",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/2TZtu1wi6AJweb68X8sQj2/948d81227213351e87c572fb7cd87de6/WFP-2715100-0926-03_TLB_062_PA_NEW_KEY_ART_TICKETING_ASSETS_091426_TodayTix_1080x1080.png"
+          },
+          "title": "The Lost Boys on Broadway - Product Media - Poster Image (Square)"
+         }
+        }
+       },
+       "venue": "Palace Theatre",
+       "lowPriceForRegularTickets": {
+        "display": "$58",
+        "currency": "USD",
+        "displayRounded": "$58",
+        "value": 58
+       },
+       "locationSeoName": "nyc"
+      },
+      {
+       "id": 47840,
+       "displayName": "Here There Are Blueberries",
+       "slug": "here-there-are-blueberries",
+       "images": {
+        "productMedia": {
+         "appHeroImage": {
+          "description": "",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/Ya0m6G2X6Kf8mO7hPw2xm/e5e8879207df1f8367de72e12a35ba48/BLU_003_PA_TICKETING_PARTNER_ASSETS_SEPT_2026_V2_Today-Tik_1440x580.jpg"
+          },
+          "title": "Here There Are Blueberries on Broadway - Product Media - App Hero Image"
+         },
+         "appHeroImageTall": {
+          "description": "",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/2aeT4RuZzSsJKs36BpFcvu/a3c84c8454a32fbe3eb15277f7173bcc/BLU_003_PA_TODAYTIX_ASSETS_SEPT_2026_1920x1080.png"
+          },
+          "title": "Here There Are Blueberries - Product Media - App Show Card Image"
+         },
+         "posterImage": {
+          "description": "",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/6Rjb7h4S9MJuvfGCsa1jHB/12f891e5688bc9ae549f7d66b2454a17/BLU_003_PA_TICKETING_PARTNER_ASSETS_SEPT_2026_V2_Today-Tik_480x720.jpg"
+          },
+          "title": "Here There Are Blueberries on Broadway - Product Media - Poster Image"
+         },
+         "posterImageLandscape": null,
+         "posterImageSquare": {
+          "description": "Poster of Here There Are Blueberries on Broadway in New York.",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/335BV2Dw8GrvCASkz6efER/8842d58369b704a1e635548054a87a06/BLU_003_PA_TICKETING_PARTNER_ASSETS_SEPT_2026_V2_Today-Tik_1024x1024.jpg"
+          },
+          "title": "Here There Are Blueberries on Broadway - Product Media - Poster Image (Square)"
+         }
+        }
+       },
+       "venue": "Barrymore Theatre",
+       "lowPriceForRegularTickets": {
+        "display": "$53",
+        "currency": "USD",
+        "displayRounded": "$53",
+        "value": 53
+       },
+       "locationSeoName": "nyc"
+      },
+      {
+       "id": 46347,
+       "displayName": "Much Ado About Nothing",
+       "slug": "much-ado-about-nothing-on-broadway",
+       "images": {
+        "productMedia": {
+         "appHeroImage": {
+          "description": "",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/2mdg9nlUsaTrksdLHMlefW/c23555a9484cbe99a0556a98313c0105/MAAN-ThirdPartyAssets-ThirdPartyAssets-TodayTix-1440x580.jpg"
+          },
+          "title": "MAAN-ThirdPartyAssets-ThirdPartyAssets-TodayTix-1440x580"
+         },
+         "appHeroImageTall": {
+          "description": "1920x1080 app homepage show card artwork for home cleanup phase 2. Pulled from the \"Hero Image 2 (1920 x 1080)\" column of the Show Board 2.0 monday.com board.",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/56lUxhyHYqe0ttOCy91lk9/f1dbb2c304b2f0e91a10a625a3ad8fa5/46347-much-ado-about-nothing-on-broadway-1920x1080.jpg"
+          },
+          "title": "Much Ado About Nothing on Broadway [46347] - NYC - App Show Card (16:9)"
+         },
+         "posterImage": {
+          "description": "",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/54fGz3aG5CpQ7PFTyiEm9v/f9481fc6db7eac3c451c48fdee845fae/MAAN-ThirdPartyAssets-ThirdPartyAssets-TodayTix-480x720.jpg"
+          },
+          "title": "MAAN-ThirdPartyAssets-ThirdPartyAssets-TodayTix-480x720"
+         },
+         "posterImageLandscape": null,
+         "posterImageSquare": {
+          "description": "",
+          "file": {
+           "url": "//images.ctfassets.net/6pezt69ih962/hfGLxyu8BzGK2syblG7B4/00b86b8e2b02d00fa8a241a0ceda7b92/image.png"
+          },
+          "title": "image"
+         }
+        }
+       },
+       "venue": "Winter Garden Theatre",
+       "lowPriceForRegularTickets": {
+        "display": "$97",
+        "currency": "USD",
+        "displayRounded": "$97",
+        "value": 97
+       },
+       "locationSeoName": "nyc"
+      }
+     ]
+    }
+   }
+  }
+ }
+}
