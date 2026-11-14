@@ -2,6 +2,10 @@
 # Install (or reinstall) one launchd agent for this user:
 #   local.show-price-scraper.daily  -- 08:00 every day: refresh catalog, check tracked shows, email digest
 #                                       (a missed 08:00 because the Mac was asleep runs once on wake)
+#   The job runs under caffeinate (-i always, -s on AC power) so the Mac can't go back to sleep mid-run;
+#   it's released when the job exits (-w) or after 2 hours at most (-t), so a hung run can't keep the Mac awake.
+#   Before this, a sleeping Mac only gave the job a few seconds every ~16 min and the Met checks failed.
+#   Optional, to also wake the Mac just before 8 (one-time, needs sudo):  sudo pmset repeat wakeorpoweron MTWRFSU 07:58:00
 # Nothing else runs in the background; open the tracker page when needed with scripts/page.sh.
 # Uninstall: scripts/install_launchd.sh --uninstall
 set -euo pipefail
@@ -30,7 +34,7 @@ cat > "$AGENTS/$DAILY.plist" <<EOF
 <plist version="1.0">
 <dict>
   <key>Label</key><string>$DAILY</string>
-  <key>ProgramArguments</key><array><string>$PY</string><string>-m</string><string>scraper.run</string></array>
+  <key>ProgramArguments</key><array><string>/bin/bash</string><string>-c</string><string>/usr/bin/caffeinate -i -s -t 7200 -w \$\$ &amp; exec '$PY' -m scraper.run</string></array>
   <key>WorkingDirectory</key><string>$ROOT</string>
   <key>StartCalendarInterval</key><dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
   <key>StandardOutPath</key><string>$ROOT/logs/run.log</string>

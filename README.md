@@ -41,7 +41,8 @@ history. Prices are each site's listed price before fees.
 ## Commands
 
 ```bash
-scripts/install_launchd.sh                      # 8 AM daily check + digest (--uninstall to remove)
+scripts/install_launchd.sh                      # 8 AM daily check + digest, kept awake while running (--uninstall to remove)
+sudo pmset repeat wakeorpoweron MTWRFSU 07:58:00  # optional: wake the Mac before 8 (undo: sudo pmset repeat cancel)
 scripts/page.sh                                 # open the tracker page; Ctrl-C to stop
 .venv/bin/python -m scraper.run                 # check everything now and email the digest
 .venv/bin/python -m scraper.run --no-email      # check everything, no email
